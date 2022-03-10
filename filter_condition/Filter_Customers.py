@@ -4,16 +4,17 @@
 
 '''
 
-
-
 class Filter_Customers():
-    
+
     # 客戶姓名錯誤類型
-    name_Error = [ ' ' , '先生', '小姐', '先生小姐' , '先生及小姐' , '盧素雪' , '張順發' ]
+    name_Error = [
+                   '先生' , '小姐' , '先生小姐' , '先生及小姐' , '先生.小姐' , '拒接' , '名字不清楚' , 'testadmin' , 'testadmin1' ,
+                   '測試' , 'test'
+                 ]
 
 
     # 判斷 _ 客戶姓名是否有誤
-    def is_Error_Customer_Name(self, name):
+    def is_Error_Customer_Name( self , name ):
 
         _name = name.strip()  # 去除空格
 
@@ -26,3 +27,9 @@ class Filter_Customers():
             return True
         else:
             return False
+
+    # 判斷 _ 客戶姓名是否有誤
+    def is_Name_Duplicated( self , name ) :
+
+        _name = name.strip()  # 去除空格
+
