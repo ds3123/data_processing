@@ -9,6 +9,9 @@ from data_format.Excel_Styles import Excel_Styles
 from filter_condition.Filter_Customers import Filter_Customers
 from openpyxl.styles import Font , Color , PatternFill , NamedStyle , Alignment
 import math
+import pymysql
+
+
 
 # 客戶
 cus = Customers_Data()
@@ -18,6 +21,7 @@ customers_2018 = cus.read_Customer_Data( '''
                                            SELECT name , master_id , phone 
                                            FROM master
                                          ''' , engine_2018 )
+
 
 # 客戶 JOIN 寵物
 customers_pets_2018 = cus.read_Customer_Data( '''
@@ -35,11 +39,9 @@ cus_Has_Pets_Id = set()
 for idx , data in customers_pets_2018.iterrows():
 
     customer_Id = data['master_id']  # 客人 master_id
-    customer_Id = '' if math.isnan( customer_Id ) else int( customer_Id )
+    customer_Id = '' if math.isnan( customer_Id ) else int( customer_Id ) # 排除 NaN、轉為 INT
 
     cus_Has_Pets_Id.add( customer_Id )
-
-print( len( cus_Has_Pets_Id )  )
 
 
 
@@ -51,6 +53,7 @@ excel      = Excel()
 wb , ws_1  = excel.get_Workbook_Sheet1()
 ws_1.title = '客戶篩選'  # 修改資料表名稱
 
+
 # 篩選錯誤條件
 filer = Filter_Customers()
 
@@ -60,13 +63,23 @@ column_Title = [ '客戶姓名' , '客戶 master_id' , '手機號碼' , '是否�
 ws_1.append( column_Title )
 
 
-for idx , data in customers_2018.iterrows() :
+
+# 從 DataFrame 分離出所需欄位
+def get_Columns( data ) :
 
     customer_Name , customer_Id , mobilePhone = (
-        data['name'] ,       # 客戶姓名
-        data['master_id'] ,  # id
-        data['phone']        # 手機號碼
+        data['name'] ,      # 客戶姓名
+        data['master_id'] , # id
+        data['phone']       # 手機號碼
     )
+
+    return customer_Name , customer_Id , mobilePhone
+
+
+for idx , data in customers_2018.iterrows() :
+
+    # 取得所需欄位
+    customer_Name , customer_Id , mobilePhone = get_Columns( data )
 
 
     # 前一個客戶姓名
@@ -74,12 +87,9 @@ for idx , data in customers_2018.iterrows() :
     customer_Name_Pre = customers_2018.loc[ pre_Index ]["name"]
 
     # 去除左右空格
-
-
     customer_Name_Pre = customer_Name_Pre.strip()
     customer_Name     = customer_Name.strip()
     mobilePhone       = mobilePhone.strip()
-
 
     # 是否有寵物
     has_Pets = '有' if customer_Id in cus_Has_Pets_Id else '無'
@@ -90,19 +100,19 @@ for idx , data in customers_2018.iterrows() :
 
     # 1.沒有寵物
     if not customer_Id in cus_Has_Pets_Id :
-        style.set_Error_Style( column_List, ws_1, idx, 'f1b103')
+        style.set_Error_Style( column_List , ws_1 , idx , 'f1b103' )
 
     # 2.姓名中有 : 測試 ( 灰色標示 )
     if '測試' in customer_Name or 'test' in customer_Name :
-        style.set_Error_Style( column_List , ws_1 , idx , '817d80')
+        style.set_Error_Style( column_List , ws_1 , idx , '817d80' )
 
     # 3.姓名中有 : 拒接 ( 黑色標示 )
     if '拒接' in customer_Name :
-        style.set_Error_Style( column_List , ws_1 , idx , '000000')
+        style.set_Error_Style( column_List , ws_1 , idx , '000000' )
 
-    # 4.姓名中有 : 停用、不用、改號碼 ( 桃色標示 )
-    if '停用' in customer_Name or '不用' in customer_Name  :
-        style.set_Error_Style( column_List , ws_1, idx, 'f815c5')
+    # 4.姓名中有 : 停用、不用、改號、已換門號 ( 桃色標示 )
+    if '停用' in customer_Name or '不用' in customer_Name or '號' in customer_Name :
+        style.set_Error_Style( column_List , ws_1 , idx , 'f815c5' )
 
     # 5.列舉清單錯誤 ( 紫色標示 Ex. '先生' , '小姐' , '先生小姐' ....  )
     if filer.is_Error_Customer_Name( customer_Name )  :
@@ -125,14 +135,16 @@ for idx , data in customers_2018.iterrows() :
     # style.set_Default_Style( column_List , ws_1 , idx)
 
 
-
-
 # 調整欄位寬度
 ws_1.column_dimensions['A'].width = 25
 ws_1.column_dimensions['B'].width = 17
 ws_1.column_dimensions['C'].width = 15
 ws_1.column_dimensions['D'].width = 15
 
+
 # 存檔
 wb.save( '../../data_files/客戶.xlsx' )
 print('存檔成功')
+
+
+

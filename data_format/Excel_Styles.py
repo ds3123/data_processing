@@ -9,8 +9,7 @@ class Excel_Styles():
     # 預設樣式
     default_Style = None ;    # 預設
     error_Style   = None ;    # 錯誤
-    align_Center  = Alignment( horizontal='center', vertical='center' ) # 置中
-
+    align_Center  = Alignment( horizontal='center' , vertical='center' ) # 置中
 
     def __init__( self ) :
         # 設定 _ 預設樣式

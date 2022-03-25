@@ -8,7 +8,7 @@ class Filter_Customers():
 
     # 客戶姓名錯誤類型
     name_Error = [
-                   '先生' , '小姐' , '先生小姐' , '先生及小姐' , '先生.小姐' , '拒接' , '名字不清楚' , 'testadmin' , 'testadmin1' ,
+                   '先生' , '小姐' , '先生小姐' , '先生及小姐' , '先生.小姐' , '?小姐' , '拒接' , '名字不清楚' , 'testadmin' , 'testadmin1' ,
                    '測試' , 'test'
                  ]
 

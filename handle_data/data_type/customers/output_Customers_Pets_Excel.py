@@ -15,11 +15,12 @@ from openpyxl.styles import Font , Color , PatternFill , NamedStyle , Alignment
 # 讀取 _ 寵物、客戶資料
 cus = Customers_Data()
 customers_pets_2018 = cus.read_Customer_Data( '''
-                                                SELECT a.name , a.master_id , a.phone , b.p_name , b.custom_id 
-                                                FROM master AS a 
-                                                RIGHT JOIN pet_data AS b 
-                                                ON a.master_id = b.master_id
-                                               ''' , engine_2018 )
+                                                  SELECT a.name , a.master_id , a.phone , b.p_name , b.custom_id 
+                                                  FROM master AS a 
+                                                  RIGHT JOIN pet_data AS b 
+                                                  ON a.master_id = b.master_id
+                                              ''' , engine_2018 )
+
 
 # 樣式
 style = Excel_Styles()
@@ -68,31 +69,29 @@ for idx , data in customers_pets_2018.iterrows():
     ws_1.append( [ customer_Name , customer_Id , mobilePhone , pet_Name , pet_Id ] )
 
     # 1.姓名中有 : 測試 ( 灰色標示 )
-    if ( '測試' in customer_Name or 'test' in customer_Name ):
-        style.set_Error_Style( column_List , ws_1 , idx , '817d80')
+    if( '測試' in customer_Name or 'test' in customer_Name ):
+        style.set_Error_Style( column_List , ws_1 , idx , '817d80' )
 
     # 2.姓名中有 : 拒接 ( 黑色標示 )
-    if ( '拒接' in customer_Name ):
-        style.set_Error_Style( column_List , ws_1 , idx , '000000')
+    if( '拒接' in customer_Name ):
+        style.set_Error_Style( column_List , ws_1 , idx , '000000' )
 
     # 3.姓名中有 : 停用、不用、改號碼 ( 桃色標示 )
-    if( '停用' in customer_Name or '不用' in customer_Name ) :
-        style.set_Error_Style( column_List , ws_1, idx, 'f815c5')
+    if( '停用' in customer_Name or '不用' in customer_Name ):
+        style.set_Error_Style( column_List , ws_1, idx, 'f815c5' )
 
     # 4.列舉清單錯誤 ( 紫色標示 Ex. '先生' , '小姐' , '先生小姐' ....  )
-    if( filer.is_Error_Customer_Name( customer_Name ) ) :
+    if( filer.is_Error_Customer_Name( customer_Name ) ):
         style.set_Error_Style( column_List , ws_1 , idx , 'ca0bec' )
 
     # 5.姓名重複( 藍色標示 )
-    if( idx > 2 and customer_Name == customer_Name_Pre ) :
+    if( idx > 2 and customer_Name == customer_Name_Pre ):
         style.set_Error_Style( column_List , ws_1 , idx-1 , '2d28f4' )
         style.set_Error_Style( column_List , ws_1 , idx , '2d28f4' )
-
         cus_Multi_Pets.add( customer_Name )
 
-
     # 6.沒有手機號碼 ( 紅色標示 )
-    if ( mobilePhone == '' ) :
+    if( mobilePhone == '' ) :
         style.set_Error_Style( column_List , ws_1 , idx , 'FF0000' )
 
     # 7.客戶姓名為數字 ( 綠色標示 )
@@ -102,12 +101,8 @@ for idx , data in customers_pets_2018.iterrows():
     # 設定 _ 預設樣式 ( 置中 )
     # style.set_Default_Style( column_List , ws_1 , idx)
 
-
-
-print( f'多隻寵物的客人數 ：{ len( cus_Multi_Pets ) } '  )
-print( f'有寵物的客人數 ： { len( cus_Has_Pets ) } ' )
-
-
+print( f' 多隻寵物的客人數 ： { len( cus_Multi_Pets ) } ' )
+print( f' 有寵物的客人數 ： { len( cus_Has_Pets ) } ' )
 
 
 
@@ -119,5 +114,5 @@ ws_1.column_dimensions['D'].width = 25
 ws_1.column_dimensions['E'].width = 15
 
 # 存檔
-#wb.save( '../../data_files/客戶_2.xlsx' )
+# wb.save( '../../data_files/客戶_2.xlsx' )
 print('存檔成功')
